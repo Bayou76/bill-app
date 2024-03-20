@@ -25,20 +25,33 @@ export default class NewBill {
     formData.append('file', file)
     formData.append('email', email)
 
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
-      })
-      .then(({fileUrl, key}) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      }).catch(error => console.error(error))
+    const splitFileName = fileName.split(".")
+    const extension = splitFileName[splitFileName.length - 1]
+    const errorFile = this.document.querySelector(`.errorFile`)
+    if (
+      extension === "jpg" ||
+      extension === "jpeg" ||
+      extension === "png"
+    ) {
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(({ fileUrl, key }) => {
+          this.billId = key
+          this.fileUrl = fileUrl
+          this.fileName = fileName
+        })
+        .catch((error) => console.error(error))
+        errorFile.style.display = "none"
+    } else {
+      errorFile.style.display = "block"
+      this.document.querySelector(`input[data-testid="file"]`).value = ""
+    }
   }
   handleSubmit = e => {
     e.preventDefault()
